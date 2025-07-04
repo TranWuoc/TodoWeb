@@ -46,7 +46,7 @@ function App() {
     };
 
     const handleAddTodo = (newTodo: TodoItem) => {
-        setTodos([...todos, newTodo]);
+        setTodos([newTodo, ...todos]);
         setShowPopup(false);
     };
 
@@ -85,7 +85,7 @@ function App() {
                         placeholder="Search for your task ..."
                         className="h-[50px] w-full rounded-2xl border-2 p-1.5 pl-10"
                     />
-                    <div className="flex h-[512px] flex-col-reverse gap-2 overflow-y-auto">
+                    <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
                         {todos.map((todo, index) => (
                             <CardInfo key={index} todo={todo} onToggle={toggleTodoState} onDelete={handleDeleteTodo} />
                         ))}
