@@ -14,7 +14,7 @@ function App() {
             return prase.map((todo: any) => ({
                 ...todo,
                 createAt: new Date(todo.createAt),
-                deadline: new Date(todo.deadline),
+                deadline: todo.deadline ? new Date(todo.deadline) : null,
             }));
         } else {
             return [];
@@ -29,7 +29,7 @@ function App() {
         setTodos((prev) =>
             prev.map((todo) => {
                 const now = new Date().getTime();
-                if (todo.deadline.getTime() <= now) {
+                if (todo.deadline && todo.deadline.getTime() <= now) {
                     return { ...todo, dueDate: true };
                 }
                 return todo;

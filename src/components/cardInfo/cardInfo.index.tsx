@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import type { TodoItem } from '../../todo.type';
 
 type CardInfoProps = {
@@ -38,7 +37,9 @@ function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
                 </span>
                 <div className="flex gap-3 p-3">
                     <span>At: {formatDate(todo.createAt)}</span>
-                    <span className="text-red-400">DeadLine: {formatDate(todo.deadline)}</span>
+                    <span className="text-red-400">
+                        DeadLine:{todo.deadline ? formatDate(todo.deadline) : 'No Deadline'}
+                    </span>
                 </div>
             </div>
             <button
