@@ -76,11 +76,13 @@ function Popup({ onClose, onAdd }: PopupProps) {
                     <p style={{ color: 'red' }}>{errors.title?.message}</p>
 
                     <div className="mt-4">
-                        Deadline:
+                        <Label htmlFor="deadline">Deadline:</Label>
                         <Controller
                             name="deadline"
                             control={control}
-                            render={({ field }) => <Calendar24 value={field.value} onChange={field.onChange} />}
+                            render={({ field }) => (
+                                <Calendar24 value={field.value ?? undefined} onChange={field.onChange} />
+                            )}
                         />
                         <p style={{ color: 'red' }}>{errors.deadline?.message}</p>
                     </div>
