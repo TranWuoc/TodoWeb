@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { ChevronDownIcon } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export function Calendar24({ value, onChange }: { value?: Date; onChange?: (date?: Date) => void }) {

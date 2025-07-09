@@ -1,17 +1,18 @@
 import type { TodoItem } from '../../todo.type';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Input } from '@/components/ui/input';
 import { Calendar24 } from '@/components/ui/Calender24';
 import { Label } from '@radix-ui/react-label';
+import InputField from '../input/InputField';
+import { Button } from '../ui/button';
 type PopupProps = {
     onClose: () => void;
     onAdd: (newTodo: TodoItem) => void;
 };
 
 const schema = yup.object({
-    title: yup.string().required('Do not blank this field').max(255, ' Title must not exceed 255 charaters '),
+    title: yup.string().required().max(255, ' Title must not exceed 255 charaters '),
     deadline: yup
         .date()
         .nullable()
@@ -26,11 +27,7 @@ const schema = yup.object({
 type FormData = yup.InferType<typeof schema>;
 
 function Popup({ onClose, onAdd }: PopupProps) {
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<FormData>({
+    const methods = useForm<FormData>({
         resolver: yupResolver(schema as yup.ObjectSchema<FormData>),
     });
 
@@ -61,42 +58,21 @@ function Popup({ onClose, onAdd }: PopupProps) {
                 <span className="float-right cursor-pointer text-[28px] font-bold" onClick={onClose}>
                     &times;
                 </span>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Controller
-                        name="title"
-                        control={control}
-                        render={({ field }) => (
-                            <>
-                                <Label htmlFor="title">Title</Label>
-                                <Input {...field} placeholder="Title todo ..." />
-                            </>
-                        )}
-                    />
+                <FormProvider {...methods}>
+                    <form onSubmit={methods.handleSubmit(onSubmit)}>
+                        <Label htmlFor="title">Title</Label>
+                        <InputField name="title" />
 
-                    <p style={{ color: 'red' }}>{errors.title?.message}</p>
+                        <div className="mt-4">
+                            <Label htmlFor="deadline">Deadline</Label>
+                            <InputField name="deadline" component={Calendar24} />
+                        </div>
 
-                    <div className="mt-4">
-                        <Label htmlFor="deadline">Deadline:</Label>
-                        <Controller
-                            name="deadline"
-                            control={control}
-                            render={({ field }) => (
-                                <Calendar24 value={field.value ?? undefined} onChange={field.onChange} />
-                            )}
-                        />
-                        <p style={{ color: 'red' }}>{errors.deadline?.message}</p>
-                    </div>
-
-                    <div className="absolute bottom-0 right-0 flex gap-2 p-2">
-                        <button
-                            className="h-[40px] w-[100px] cursor-pointer rounded-2xl"
-                            type="submit"
-                            style={{ backgroundColor: '#F3A950', color: '#161B21' }}
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </form>
+                        <div className="absolute bottom-0 right-0 flex gap-2 p-2">
+                            <Button type="submit">Submit</Button>
+                        </div>
+                    </form>
+                </FormProvider>
             </div>
         </div>
     );
