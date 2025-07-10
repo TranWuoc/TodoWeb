@@ -5,42 +5,19 @@ import CardInfo from './components/cardInfo/cardInfo.index';
 import Popup from './components/popup/popop.index';
 import type { TodoItem } from './todo.type';
 import { Button } from './components/ui/button';
+import { loadTodos, saveTodos } from './utils/todoStorage';
 
 function App() {
     const [showPopup, setShowPopup] = useState(false);
-    const [todos, setTodos] = useState<TodoItem[]>(() => {
-        const storeTodos = localStorage.getItem('todos');
-        if (storeTodos) {
-            const prase = JSON.parse(storeTodos);
-            return prase.map((todo: any) => ({
-                ...todo,
-                createAt: new Date(todo.createAt),
-                deadline: todo.deadline ? new Date(todo.deadline) : null,
-            }));
-        } else {
-            return [];
-        }
-    });
-    const [tododelete, setTodoDelete] = useState<TodoItem[]>(() => {
-        const storateTodoDelete = localStorage.getItem('tododelete');
-        if (storateTodoDelete) {
-            const prase = JSON.parse(storateTodoDelete);
-            return prase.map((todo: any) => ({
-                ...todo,
-                createAt: new Date(todo.createAt),
-                deadline: todo.deadline ? new Date(todo.deadline) : null,
-            }));
-        } else {
-            return [];
-        }
-    });
+    const [todos, setTodos] = useState<TodoItem[]>(loadTodos('todos'));
+    const [tododelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
 
     useEffect(() => {
-        localStorage.setItem('todos', JSON.stringify(todos));
+        saveTodos('todos', todos);
     }, [todos]);
 
     useEffect(() => {
-        localStorage.setItem('tododelete', JSON.stringify(tododelete));
+        saveTodos('tododelete', tododelete);
     }, [tododelete]);
 
     useEffect(() => {
@@ -109,8 +86,13 @@ function App() {
                         className="h-[50px] w-full rounded-2xl border-2 p-1.5 pl-10"
                     />
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
-                        {todos.map((todo, index) => (
-                            <CardInfo key={index} todo={todo} onToggle={toggleTodoState} onDelete={handleDeleteTodo} />
+                        {todos.map((todo) => (
+                            <CardInfo
+                                key={todo.id}
+                                todo={todo}
+                                onToggle={toggleTodoState}
+                                onDelete={handleDeleteTodo}
+                            />
                         ))}
                     </div>
                 </div>

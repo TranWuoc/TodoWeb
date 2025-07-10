@@ -1,6 +1,6 @@
 import type { TodoItem } from '../../todo.type';
 import { Button } from '../ui/button';
-import formatDate from '../formatdate';
+import formatDate from '../../utils/formatdate';
 import { Input } from '../ui/input';
 type CardInfoProps = {
     todo: TodoItem;

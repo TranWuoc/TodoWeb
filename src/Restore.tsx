@@ -1,37 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Label } from './components/ui/label';
 import type { TodoItem } from './todo.type';
-import formatDate from './components/formatdate';
+import formatDate from './utils/formatdate';
 import { Button } from './components/ui/button';
+import { loadTodos, saveTodos } from './utils/todoStorage';
 
 function Restore() {
-    const [todosdelete, setTodoDelete] = useState<TodoItem[]>(() => {
-        const storeTodoDelete = localStorage.getItem('tododelete');
-        if (storeTodoDelete) {
-            const param = JSON.parse(storeTodoDelete);
-            return param.map((todo: any) => ({
-                ...todo,
-                createAt: new Date(todo.createAt),
-                deadline: todo.deadline ? new Date(todo.deadline) : null,
-            }));
-        } else {
-            return [];
-        }
-    });
+    const [todosdelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
 
     useEffect(() => {
-        localStorage.setItem('tododelete', JSON.stringify(todosdelete));
+        saveTodos('tododelete', todosdelete);
     }, [todosdelete]);
 
     const handleRestore = (id: number) => {
         const todoToRestore = todosdelete.find((todo) => todo.id == id);
         if (!todoToRestore) return;
 
-        const storeTodos = localStorage.getItem('todos');
         let todos: TodoItem[] = [];
+        const storeTodos = localStorage.getItem('todos');
         if (storeTodos) {
-            const param = JSON.parse(storeTodos);
-            todos = param.map((todo: any) => ({
+            const prased = JSON.parse(storeTodos);
+            todos = prased.map((todo: any) => ({
                 ...todo,
                 createAt: new Date(todo.createAt),
                 deadline: todo.deadline ? new Date(todo.deadline) : null,
@@ -39,7 +28,7 @@ function Restore() {
         }
 
         const newTodos = [...todos, todoToRestore];
-        localStorage.setItem('todos', JSON.stringify(newTodos));
+        saveTodos('todos', newTodos);
 
         setTodoDelete((prev) =>
             prev.filter((todo) => {

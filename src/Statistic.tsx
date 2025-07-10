@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Label } from './components/ui/label';
 import type { TodoItem } from './todo.type';
 import { Separator } from './components/ui/separator';
-import formatDate from './components/formatdate';
+import formatDate from './utils/formatdate';
 function Statistic() {
     const [todos] = useState<TodoItem[]>(() => {
         const storeTodos = localStorage.getItem('todos');
