@@ -5,4 +5,5 @@ export type TodoItem = {
     deadline?: Date | null;
     isCompleted: boolean;
     dueDate: boolean;
+    isDelete: boolean;
 };

@@ -4,6 +4,7 @@ import App from './App.tsx';
 import Statistic from './Statistic.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './Root.tsx';
+import Restore from './Restore.tsx';
 
 const router = createBrowserRouter([
     {
@@ -11,12 +12,16 @@ const router = createBrowserRouter([
         element: <Root />,
         children: [
             {
-                path: '/app',
+                path: '/',
                 element: <App />,
             },
             {
                 path: '/statistic',
                 element: <Statistic />,
+            },
+            {
+                path: '/restore',
+                element: <Restore />,
             },
         ],
     },

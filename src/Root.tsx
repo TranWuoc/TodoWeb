@@ -16,10 +16,7 @@ function Root() {
                 </div>
 
                 <div className="m-2 flex flex-col justify-items-center gap-3">
-                    <Link
-                        to={`/app`}
-                        className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200"
-                    >
+                    <Link to={`/`} className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200">
                         <Label htmlFor="App" className="ml-3 cursor-pointer text-[20px]">
                             App
                         </Label>
@@ -33,14 +30,22 @@ function Root() {
                             Statistic
                         </Label>
                     </Link>
+                    <Separator />
+                    <Link
+                        to={`/restore`}
+                        className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200"
+                    >
+                        <Label htmlFor="restore" className="ml-3 cursor-pointer text-[20px]">
+                            Restore
+                        </Label>
+                    </Link>
                 </div>
             </div>
             {!outlet && (
                 <div className="mt-[400px] flex h-full w-[1040px] items-center">
-                    <div className="flex flex-col items-center gap-3">
-                        <Label htmlFor="heding-text" className="ml-[30px] text-4xl">
-                            Build your Component Library
-                        </Label>
+                    <div className="ml-[350px] flex flex-col items-center gap-3">
+                        <p className="text-3xl font-bold">Build your Component Library</p>
+
                         <p className="flex items-center justify-center text-center">
                             A set of beautifully-designed, accessible components and a code distribution platform.
                             <br /> Works with your favorite frameworks. Open Source. Open Code.

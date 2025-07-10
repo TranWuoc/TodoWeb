@@ -41,8 +41,8 @@ function Popup({ onClose, onAdd }: PopupProps) {
             deadline: data.deadline,
             isCompleted: false,
             dueDate: false,
+            isDelete: false,
         };
-        console.log(newTodo);
         onAdd(newTodo);
     };
 

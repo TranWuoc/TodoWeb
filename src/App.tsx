@@ -4,6 +4,7 @@ import searchIcon from './assets/search.svg';
 import CardInfo from './components/cardInfo/cardInfo.index';
 import Popup from './components/popup/popop.index';
 import type { TodoItem } from './todo.type';
+import { Button } from './components/ui/button';
 
 function App() {
     const [showPopup, setShowPopup] = useState(false);
@@ -20,10 +21,27 @@ function App() {
             return [];
         }
     });
+    const [tododelete, setTodoDelete] = useState<TodoItem[]>(() => {
+        const storateTodoDelete = localStorage.getItem('tododelete');
+        if (storateTodoDelete) {
+            const prase = JSON.parse(storateTodoDelete);
+            return prase.map((todo: any) => ({
+                ...todo,
+                createAt: new Date(todo.createAt),
+                deadline: todo.deadline ? new Date(todo.deadline) : null,
+            }));
+        } else {
+            return [];
+        }
+    });
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
     }, [todos]);
+
+    useEffect(() => {
+        localStorage.setItem('tododelete', JSON.stringify(tododelete));
+    }, [tododelete]);
 
     useEffect(() => {
         setTodos((prev) =>
@@ -49,6 +67,7 @@ function App() {
         setTodos([newTodo, ...todos]);
         setShowPopup(false);
     };
+    console.log(todos);
 
     const toggleTodoState = (id: number) => {
         setTodos((prev) =>
@@ -69,11 +88,15 @@ function App() {
                 }
             }),
         );
+        const deletedTodo = todos.find((todo) => todo.id === id);
+        if (deletedTodo) {
+            setTodoDelete((prev) => [deletedTodo, ...prev]);
+        }
     };
 
     return (
         <div className="flex flex-row justify-center p-[20px]">
-            <div className="flex h-[800px] w-[550px] flex-col rounded-2xl" style={{ backgroundColor: '#D7C49E' }}>
+            <div className="flex h-[800px] w-[550px] flex-col rounded-2xl bg-gray-100">
                 <div className="h-1/12 w-full rounded-t-2xl" style={{ backgroundColor: '#343148' }}>
                     <h1 className="flex justify-center p-3 text-3xl" style={{ color: '#D7C49E' }}>
                         ToDoWeb
@@ -91,13 +114,12 @@ function App() {
                         ))}
                     </div>
                 </div>
-                <button
-                    className="rounded-4xl absolute ml-[250px] mt-[700px] h-[50px] w-[50px] cursor-pointer text-4xl"
-                    style={{ backgroundColor: '#9A161F' }}
+                <Button
+                    className="rounded-4xl absolute ml-[250px] mt-[700px] h-[50px] w-[50px] cursor-pointer bg-gray-400 text-4xl text-black hover:bg-zinc-500"
                     onClick={handleOpenAddTodo}
                 >
                     +
-                </button>
+                </Button>
                 {showPopup && <Popup onClose={handleCloseAddTodo} onAdd={handleAddTodo} />}
                 <div
                     className="flex h-[80px] w-full flex-row rounded-b-2xl"
