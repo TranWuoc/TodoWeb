@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Label } from './components/ui/label';
-import type { TodoItem } from './todo.type';
-import formatDate from './utils/formatdate';
-import { Button } from './components/ui/button';
-import { loadTodos, saveTodos } from './utils/todoStorage';
+import { Label } from '../components/ui/label';
+import type { TodoItem } from '../todo.type';
+import formatDate from '../utils/formatdate';
+import { Button } from '../components/ui/button';
+import { loadTodos, saveTodos } from '../utils/todoStorage';
 
 function Restore() {
     const [todosdelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));

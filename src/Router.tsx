@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import Statistic from './Statistic.tsx';
+import App from './Pages/Home.tsx';
+import Statistic from './Pages/Statistic.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Root from './Root.tsx';
-import Restore from './Restore.tsx';
+import Root from './Pages/Root.tsx';
+import Restore from './Pages/Restore.tsx';
 
 const router = createBrowserRouter([
     {

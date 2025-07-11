@@ -1,6 +1,6 @@
-import { Button } from './components/ui/button';
-import { Label } from './components/ui/label';
-import { Separator } from './components/ui/separator';
+import { Button } from '../components/ui/button';
+import { Label } from '../components/ui/label';
+import { Separator } from '../components/ui/separator';
 import { Outlet, Link, useOutlet } from 'react-router-dom';
 
 function Root() {
