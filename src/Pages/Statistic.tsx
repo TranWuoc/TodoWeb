@@ -1,22 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Label } from '../components/ui/label';
 import type { TodoItem } from '../todo.type';
 import { Separator } from '../components/ui/separator';
 import formatDate from '../utils/formatdate';
+import { getTodos } from '@/services/todoService';
 function Statistic() {
-    const [todos] = useState<TodoItem[]>(() => {
-        const storeTodos = localStorage.getItem('todos');
-        if (storeTodos) {
-            const param = JSON.parse(storeTodos);
-            return param.map((todo: any) => ({
-                ...todo,
-                createAt: new Date(todo.createAt),
-                deadline: todo.deadline ? new Date(todo.deadline) : null,
-            }));
-        } else {
-            return [];
-        }
-    });
+    const [todos, setTodos] = useState<TodoItem[]>([]);
+
+    useEffect(() => {
+        getTodos().then(setTodos);
+    }, []);
 
     return (
         <div className="mt-[50px] flex items-center justify-center p-[20px]">
@@ -36,7 +29,7 @@ function Statistic() {
                                     .filter((todo) => todo.isCompleted)
                                     .map((todo) => (
                                         <div
-                                            key={todo.id}
+                                            key={todo.documentId}
                                             className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">
@@ -59,7 +52,7 @@ function Statistic() {
                                     .filter((todo) => !todo.isCompleted)
                                     .map((todo) => (
                                         <div
-                                            key={todo.id}
+                                            key={todo.documentId}
                                             className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">

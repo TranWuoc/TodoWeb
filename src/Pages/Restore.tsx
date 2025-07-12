@@ -4,6 +4,7 @@ import type { TodoItem } from '../todo.type';
 import formatDate from '../utils/formatdate';
 import { Button } from '../components/ui/button';
 import { loadTodos, saveTodos } from '../utils/todoStorage';
+import { createTodo } from '@/services/todoService';
 
 function Restore() {
     const [todosdelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
@@ -12,27 +13,18 @@ function Restore() {
         saveTodos('tododelete', todosdelete);
     }, [todosdelete]);
 
-    const handleRestore = (id: number) => {
-        const todoToRestore = todosdelete.find((todo) => todo.id == id);
+    const handleRestore = async (documentId: string) => {
+        const todoToRestore = todosdelete.find((todo) => todo.documentId == documentId);
         if (!todoToRestore) return;
 
-        let todos: TodoItem[] = [];
-        const storeTodos = localStorage.getItem('todos');
-        if (storeTodos) {
-            const prased = JSON.parse(storeTodos);
-            todos = prased.map((todo: any) => ({
-                ...todo,
-                createAt: new Date(todo.createAt),
-                deadline: todo.deadline ? new Date(todo.deadline) : null,
-            }));
-        }
-
-        const newTodos = [...todos, todoToRestore];
-        saveTodos('todos', newTodos);
+        await createTodo({
+            ...todoToRestore,
+            documentId: undefined,
+        });
 
         setTodoDelete((prev) =>
             prev.filter((todo) => {
-                if (todo.id !== id) return todo;
+                if (todo.documentId !== documentId) return todo;
             }),
         );
     };
@@ -45,7 +37,7 @@ function Restore() {
             <div className="mt-14 flex h-[500px] w-[700px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-gray-100 p-2">
                 {todosdelete.map((todo) => (
                     <div
-                        key={todo.id}
+                        key={todo.documentId}
                         className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                     >
                         <div className="flex justify-between">
@@ -61,7 +53,7 @@ function Restore() {
                                     {todo.deadline ? formatDate(todo.deadline) : 'No DeadLine'}
                                 </Label>
                             </div>
-                            <Button className="mr-3" onClick={() => handleRestore(todo.id)}>
+                            <Button className="mr-3" onClick={() => handleRestore(todo.documentId)}>
                                 Restore
                             </Button>
                         </div>

@@ -39,6 +39,15 @@ function Root() {
                             Restore
                         </Label>
                     </Link>
+                    <Separator />
+                    <Link
+                        to={`/test`}
+                        className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200"
+                    >
+                        <Label htmlFor="test" className="ml-3 cursor-pointer text-[20px]">
+                            TestData
+                        </Label>
+                    </Link>
                 </div>
             </div>
             {!outlet && (

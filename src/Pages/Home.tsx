@@ -6,31 +6,36 @@ import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../todo.type';
 import { Button } from '../components/ui/button';
 import { loadTodos, saveTodos } from '../utils/todoStorage';
+import { deleteTodo, getTodos, updateTodo } from '@/services/todoService';
 
-function App() {
+function Home() {
     const [showPopup, setShowPopup] = useState(false);
-    const [todos, setTodos] = useState<TodoItem[]>(loadTodos('todos'));
+    const [todos, setTodos] = useState<TodoItem[]>([]);
     const [tododelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
 
     useEffect(() => {
-        saveTodos('todos', todos);
-    }, [todos]);
+        getTodos().then(setTodos);
+    }, []);
 
     useEffect(() => {
         saveTodos('tododelete', tododelete);
     }, [tododelete]);
 
     useEffect(() => {
-        setTodos((prev) =>
-            prev.map((todo) => {
-                const now = new Date().getTime();
-                if (todo.deadline && todo.deadline.getTime() <= now) {
-                    return { ...todo, dueDate: true };
-                }
-                return todo;
-            }),
+        const now = new Date().getTime();
+        const todosUpdate = todos.filter((todo) => todo.deadline && todo.deadline.getTime() <= now && !todo.dueDate);
+
+        Promise.all(todosUpdate.map((todo) => updateTodo(todo.documentId, { dueDate: true }))).then(() =>
+            setTodos((prev) =>
+                prev.map((todo) => {
+                    if (todo.deadline && todo.deadline.getTime() <= now) {
+                        return { ...todo, dueDate: true };
+                    }
+                    return todo;
+                }),
+            ),
         );
-    }, []);
+    }, [todos]);
 
     const handleOpenAddTodo = () => {
         setShowPopup(true);
@@ -44,31 +49,21 @@ function App() {
         setTodos([newTodo, ...todos]);
         setShowPopup(false);
     };
-    console.log(todos);
 
-    const toggleTodoState = (id: number) => {
-        setTodos((prev) =>
-            prev.map((todo) => {
-                if (todo.id === id) {
-                    return { ...todo, isCompleted: !todo.isCompleted };
-                }
-                return todo;
-            }),
-        );
+    const toggleTodoState = async (documentId: string) => {
+        const todo = todos.find((t) => t.documentId === documentId);
+        if (!todo) return;
+
+        await updateTodo(documentId, {
+            isCompleted: !todo.isCompleted,
+        });
+
+        setTodos((prev) => prev.map((t) => (t.documentId === documentId ? { ...t, isCompleted: !t.isCompleted } : t)));
     };
 
-    const handleDeleteTodo = (id: number) => {
-        setTodos((prev) =>
-            prev.filter((todo) => {
-                if (todo.id !== id) {
-                    return todo;
-                }
-            }),
-        );
-        const deletedTodo = todos.find((todo) => todo.id === id);
-        if (deletedTodo) {
-            setTodoDelete((prev) => [deletedTodo, ...prev]);
-        }
+    const handleDeleteTodo = async (documentId: string) => {
+        await deleteTodo(documentId);
+        setTodos((prev) => prev.filter((todo) => todo.documentId !== documentId));
     };
 
     return (
@@ -88,10 +83,10 @@ function App() {
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
                         {todos.map((todo) => (
                             <CardInfo
-                                key={todo.id}
+                                key={todo.documentId}
                                 todo={todo}
                                 onToggle={toggleTodoState}
-                                onDelete={handleDeleteTodo}
+                                onDelete={() => handleDeleteTodo(todo.documentId)}
                             />
                         ))}
                     </div>
@@ -112,4 +107,4 @@ function App() {
     );
 }
 
-export default App;
+export default Home;

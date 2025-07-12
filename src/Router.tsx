@@ -1,10 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './Pages/Home.tsx';
+import Home from './Pages/Home.tsx';
 import Statistic from './Pages/Statistic.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './Pages/Root.tsx';
 import Restore from './Pages/Restore.tsx';
+import TestApi from './Pages/TestApi.tsx';
 
 const router = createBrowserRouter([
     {
@@ -13,7 +14,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <App />,
+                element: <Home />,
             },
             {
                 path: '/statistic',
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
             {
                 path: '/restore',
                 element: <Restore />,
+            },
+            {
+                path: '/test',
+                element: <TestApi />,
             },
         ],
     },

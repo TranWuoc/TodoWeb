@@ -6,6 +6,7 @@ import { Calendar24 } from '@/components/ui/Calender24';
 import { Label } from '@radix-ui/react-label';
 import InputField from '../input/InputField';
 import { Button } from '../ui/button';
+import { createTodo } from '@/services/todoService';
 type PopupProps = {
     onClose: () => void;
     onAdd: (newTodo: TodoItem) => void;
@@ -31,19 +32,16 @@ function Popup({ onClose, onAdd }: PopupProps) {
         resolver: yupResolver(schema as yup.ObjectSchema<FormData>),
     });
 
-    const onSubmit = (data: FormData) => {
-        const idTodo = Math.floor(Math.random() * 1000000);
-        const now = new Date();
+    const onSubmit = async (data: FormData) => {
         const newTodo = {
-            id: idTodo,
             title: data.title,
-            createAt: now,
-            deadline: data.deadline,
+            createAt: new Date(),
+            deadline: data.deadline ? new Date(data.deadline) : null,
             isCompleted: false,
             dueDate: false,
-            isDelete: false,
         };
-        onAdd(newTodo);
+        const created = await createTodo(newTodo);
+        onAdd(created);
     };
 
     return (
