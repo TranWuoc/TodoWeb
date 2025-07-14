@@ -5,27 +5,18 @@ import CardInfo from '../components/cardInfo/cardInfo.index';
 import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../todo.type';
 import { Button } from '../components/ui/button';
-import { loadTodos, saveTodos } from '../utils/todoStorage';
 import { deleteTodo, getTodos, updateTodo } from '@/services/todoService';
 
 function Home() {
     const [showPopup, setShowPopup] = useState(false);
     const [todos, setTodos] = useState<TodoItem[]>([]);
-    const [tododelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
+    console.log(todos);
 
-    useEffect(() => {
-        getTodos().then(setTodos);
-    }, []);
-
-    useEffect(() => {
-        saveTodos('tododelete', tododelete);
-    }, [tododelete]);
-
-    useEffect(() => {
+    const checkOverDue = async (todos: TodoItem[]) => {
         const now = new Date().getTime();
         const todosUpdate = todos.filter((todo) => todo.deadline && todo.deadline.getTime() <= now && !todo.dueDate);
 
-        Promise.all(todosUpdate.map((todo) => updateTodo(todo.documentId, { dueDate: true }))).then(() =>
+        Promise.all(todosUpdate.map((todo) => updateTodo(todo.id, { dueDate: true }))).then(() =>
             setTodos((prev) =>
                 prev.map((todo) => {
                     if (todo.deadline && todo.deadline.getTime() <= now) {
@@ -35,7 +26,14 @@ function Home() {
                 }),
             ),
         );
-    }, [todos]);
+    };
+
+    useEffect(() => {
+        getTodos().then((todos) => {
+            setTodos(todos);
+            checkOverDue(todos);
+        });
+    }, []);
 
     const handleOpenAddTodo = () => {
         setShowPopup(true);
@@ -45,25 +43,26 @@ function Home() {
         setShowPopup(false);
     };
 
-    const handleAddTodo = (newTodo: TodoItem) => {
-        setTodos([newTodo, ...todos]);
+    const handleAddTodo = async () => {
+        const todosData = await getTodos();
+        setTodos(todosData);
         setShowPopup(false);
     };
 
-    const toggleTodoState = async (documentId: string) => {
-        const todo = todos.find((t) => t.documentId === documentId);
+    const toggleTodoState = async (id: number) => {
+        const todo = todos.find((t) => t.id === id);
         if (!todo) return;
 
-        await updateTodo(documentId, {
+        await updateTodo(id, {
             isCompleted: !todo.isCompleted,
         });
 
-        setTodos((prev) => prev.map((t) => (t.documentId === documentId ? { ...t, isCompleted: !t.isCompleted } : t)));
+        setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, isCompleted: !t.isCompleted } : t)));
     };
 
-    const handleDeleteTodo = async (documentId: string) => {
-        await deleteTodo(documentId);
-        setTodos((prev) => prev.filter((todo) => todo.documentId !== documentId));
+    const handleDeleteTodo = async (id: number) => {
+        await deleteTodo(id);
+        setTodos((prev) => prev.filter((todo) => todo.id !== id));
     };
 
     return (
@@ -83,10 +82,10 @@ function Home() {
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
                         {todos.map((todo) => (
                             <CardInfo
-                                key={todo.documentId}
+                                key={todo.id}
                                 todo={todo}
                                 onToggle={toggleTodoState}
-                                onDelete={() => handleDeleteTodo(todo.documentId)}
+                                onDelete={() => handleDeleteTodo(todo.id)}
                             />
                         ))}
                     </div>

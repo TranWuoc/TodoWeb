@@ -4,8 +4,8 @@ import formatDate from '../../utils/formatdate';
 import { Input } from '../ui/input';
 type CardInfoProps = {
     todo: TodoItem;
-    onToggle: (documentId: string) => void;
-    onDelete: (documentId: string) => void;
+    onToggle: (id: number) => void;
+    onDelete: (id: number) => void;
 };
 
 function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
@@ -18,7 +18,7 @@ function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
                 type={'checkbox'}
                 checked={todo.isCompleted}
                 className="ml-2.5 mt-10 h-8 w-8"
-                onChange={() => onToggle(todo.documentId)}
+                onChange={() => onToggle(todo.id)}
                 style={{ accentColor: '#f3f4f6' }}
             />
             <div className="flex flex-col">
@@ -43,7 +43,7 @@ function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
             <Button
                 className="m-[10px] mt-[50px] cursor-pointer"
                 variant="destructive"
-                onClick={() => onDelete(todo.documentId)}
+                onClick={() => onDelete(todo.id)}
             >
                 Delete
             </Button>

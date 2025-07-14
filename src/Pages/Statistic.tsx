@@ -29,7 +29,7 @@ function Statistic() {
                                     .filter((todo) => todo.isCompleted)
                                     .map((todo) => (
                                         <div
-                                            key={todo.documentId}
+                                            key={todo.id}
                                             className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">
@@ -52,7 +52,7 @@ function Statistic() {
                                     .filter((todo) => !todo.isCompleted)
                                     .map((todo) => (
                                         <div
-                                            key={todo.documentId}
+                                            key={todo.id}
                                             className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">

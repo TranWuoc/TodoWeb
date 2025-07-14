@@ -1,5 +1,5 @@
 export type TodoItem = {
-    documentId: string;
+    id: number;
     title: string;
     createAt: Date;
     deadline?: Date | null;

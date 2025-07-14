@@ -3,28 +3,29 @@ import { Label } from '../components/ui/label';
 import type { TodoItem } from '../todo.type';
 import formatDate from '../utils/formatdate';
 import { Button } from '../components/ui/button';
-import { loadTodos, saveTodos } from '../utils/todoStorage';
-import { createTodo } from '@/services/todoService';
+import { getTodosDeleted, restoreTodo } from '@/services/todoService';
 
 function Restore() {
-    const [todosdelete, setTodoDelete] = useState<TodoItem[]>(loadTodos('tododelete'));
+    const [todosdelete, setTodoDelete] = useState<TodoItem[]>([]);
 
     useEffect(() => {
-        saveTodos('tododelete', todosdelete);
-    }, [todosdelete]);
+        getTodosDeleted().then((data) => {
+            setTodoDelete(Array.isArray(data) ? data : []);
+        });
+    }, []);
 
-    const handleRestore = async (documentId: string) => {
-        const todoToRestore = todosdelete.find((todo) => todo.documentId == documentId);
-        if (!todoToRestore) return;
+    console.log(todosdelete);
 
-        await createTodo({
+    const handleRestore = async (id: number) => {
+        const todoToRestore = todosdelete.find((todo) => todo.id == id);
+
+        await restoreTodo(id, {
             ...todoToRestore,
-            documentId: undefined,
         });
 
         setTodoDelete((prev) =>
             prev.filter((todo) => {
-                if (todo.documentId !== documentId) return todo;
+                if (todo.id !== id) return todo;
             }),
         );
     };
@@ -37,7 +38,7 @@ function Restore() {
             <div className="mt-14 flex h-[500px] w-[700px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-gray-100 p-2">
                 {todosdelete.map((todo) => (
                     <div
-                        key={todo.documentId}
+                        key={todo.id}
                         className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 bg-zinc-300"
                     >
                         <div className="flex justify-between">
@@ -53,7 +54,7 @@ function Restore() {
                                     {todo.deadline ? formatDate(todo.deadline) : 'No DeadLine'}
                                 </Label>
                             </div>
-                            <Button className="mr-3" onClick={() => handleRestore(todo.documentId)}>
+                            <Button className="mr-3" onClick={() => handleRestore(todo.id)}>
                                 Restore
                             </Button>
                         </div>
