@@ -6,11 +6,12 @@ import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../todo.type';
 import { Button } from '../components/ui/button';
 import { deleteTodo, getTodos, updateTodo } from '@/services/todoService';
+import { Input } from '@/components/ui/input';
 
 function Home() {
     const [showPopup, setShowPopup] = useState(false);
     const [todos, setTodos] = useState<TodoItem[]>([]);
-    console.log(todos);
+    const [search, setSearch] = useState('');
 
     const checkOverDue = async (todos: TodoItem[]) => {
         const now = new Date().getTime();
@@ -29,10 +30,12 @@ function Home() {
     };
 
     useEffect(() => {
-        getTodos().then((todos) => {
-            setTodos(todos);
-            checkOverDue(todos);
-        });
+        getTodos()
+            .then((todos) => {
+                setTodos(todos);
+                checkOverDue(todos);
+            })
+            .catch((error) => console.log(error));
     }, []);
 
     const handleOpenAddTodo = () => {
@@ -61,9 +64,11 @@ function Home() {
     };
 
     const handleDeleteTodo = async (id: number) => {
-        await deleteTodo(id);
+        await deleteTodo(id).catch((error) => console.log(error));
         setTodos((prev) => prev.filter((todo) => todo.id !== id));
     };
+
+    const filteredTodos = todos.filter((todo) => todo.title.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div className="flex flex-row justify-center p-[20px]">
@@ -75,12 +80,13 @@ function Home() {
                 </div>
                 <div className="flex h-5/6 flex-col gap-2 p-5">
                     <img src={searchIcon} alt="" className="absolute ml-2 mt-3 h-7 w-7" />
-                    <input
+                    <Input
                         placeholder="Search for your task ..."
-                        className="h-[50px] w-full rounded-2xl border-2 p-1.5 pl-10"
+                        className="h-[50px] w-full rounded-2xl border-2 border-black p-1.5 pl-10"
+                        onChange={(e) => setSearch(e.target.value)}
                     />
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
-                        {todos.map((todo) => (
+                        {(search.trim() ? filteredTodos : todos).map((todo) => (
                             <CardInfo
                                 key={todo.id}
                                 todo={todo}

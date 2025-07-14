@@ -9,19 +9,19 @@ function Restore() {
     const [todosdelete, setTodoDelete] = useState<TodoItem[]>([]);
 
     useEffect(() => {
-        getTodosDeleted().then((data) => {
-            setTodoDelete(Array.isArray(data) ? data : []);
-        });
+        getTodosDeleted()
+            .then((data) => {
+                setTodoDelete(Array.isArray(data) ? data : []);
+            })
+            .catch((error) => console.log(error));
     }, []);
-
-    console.log(todosdelete);
 
     const handleRestore = async (id: number) => {
         const todoToRestore = todosdelete.find((todo) => todo.id == id);
 
         await restoreTodo(id, {
             ...todoToRestore,
-        });
+        }).catch((error) => console.log(error));
 
         setTodoDelete((prev) =>
             prev.filter((todo) => {
@@ -39,7 +39,7 @@ function Restore() {
                 {todosdelete.map((todo) => (
                     <div
                         key={todo.id}
-                        className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 bg-zinc-300"
+                        className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 border-red-600 bg-zinc-300"
                     >
                         <div className="flex justify-between">
                             <div className="ml-[20px] flex flex-col gap-2">
@@ -54,7 +54,11 @@ function Restore() {
                                     {todo.deadline ? formatDate(todo.deadline) : 'No DeadLine'}
                                 </Label>
                             </div>
-                            <Button className="mr-3" onClick={() => handleRestore(todo.id)}>
+                            <Button
+                                variant="outline"
+                                className="mr-3 cursor-pointer"
+                                onClick={() => handleRestore(todo.id)}
+                            >
                                 Restore
                             </Button>
                         </div>

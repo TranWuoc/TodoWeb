@@ -37,7 +37,7 @@ function Root() {
                             Restore
                         </Label>
                     </Link>
-                    <Separator />
+                    {/* <Separator />
                     <Link
                         to={`/test`}
                         className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200"
@@ -45,7 +45,7 @@ function Root() {
                         <Label htmlFor="test" className="ml-3 cursor-pointer text-[20px]">
                             TestData
                         </Label>
-                    </Link>
+                    </Link> */}
                 </div>
             </div>
             <div id="detail" className="flex-1">

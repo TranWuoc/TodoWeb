@@ -8,7 +8,9 @@ function Statistic() {
     const [todos, setTodos] = useState<TodoItem[]>([]);
 
     useEffect(() => {
-        getTodos().then(setTodos);
+        getTodos()
+            .then(setTodos)
+            .catch((error) => console.log(error));
     }, []);
 
     return (
@@ -21,7 +23,7 @@ function Statistic() {
                     <Separator />
                     <div className="flex flex-row gap-5">
                         <div className="flex h-[300px] w-[420px] flex-col gap-5 overflow-y-auto">
-                            <Label> Todo is completed </Label>
+                            <Label className="text-green-500"> Todo is completed </Label>
                             {todos.filter((todo) => todo.isCompleted).length === 0 ? (
                                 <Label>No todo</Label>
                             ) : (
@@ -30,7 +32,7 @@ function Statistic() {
                                     .map((todo) => (
                                         <div
                                             key={todo.id}
-                                            className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
+                                            className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 border-green-500 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">
                                                 <Label htmlFor="todo">Todo: {todo.title}</Label>
@@ -44,16 +46,16 @@ function Statistic() {
                             )}
                         </div>
                         <div className="flex h-[300px] w-[420px] flex-col gap-5 overflow-y-auto">
-                            <Label> Todo isn't completed </Label>
-                            {todos.filter((todo) => !todo.isCompleted).length === 0 ? (
+                            <Label className="text-red-600"> Todos were out of date </Label>
+                            {todos.filter((todo) => todo.dueDate == true).length === 0 ? (
                                 <Label>No todo</Label>
                             ) : (
                                 todos
-                                    .filter((todo) => !todo.isCompleted)
+                                    .filter((todo) => todo.dueDate == true)
                                     .map((todo) => (
                                         <div
                                             key={todo.id}
-                                            className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 bg-zinc-300"
+                                            className="flex h-[70px] min-h-[70px] w-[400px] flex-col justify-center rounded-2xl border-2 border-red-600 bg-zinc-300"
                                         >
                                             <div className="ml-[20px] flex flex-col gap-2">
                                                 <Label htmlFor="todo">Todo: {todo.title}</Label>
