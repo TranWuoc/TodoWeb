@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './Pages/Root.tsx';
 import Restore from './Pages/Restore.tsx';
 import TestApi from './Pages/TestApi.tsx';
+import Auth from './Pages/Auth.tsx';
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
                 element: <TestApi />,
             },
         ],
+    },
+    {
+        path: '/auth',
+        element: <Auth />,
     },
 ]);
 

@@ -1,4 +1,4 @@
-import type { TodoItem } from '@/todo.type';
+import type { TodoItem } from '@/types/todo.type';
 
 export function loadTodos(key: string): TodoItem[] {
     const storeTodo = localStorage.getItem(key);

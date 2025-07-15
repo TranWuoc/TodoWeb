@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Label } from '../components/ui/label';
-import type { TodoItem } from '../todo.type';
+import type { TodoItem } from '../types/todo.type';
 import formatDate from '../utils/formatdate';
 import { Button } from '../components/ui/button';
-import { getTodosDeleted, restoreTodo } from '@/services/todoService';
+import { deleteHardTodo, getTodosDeleted, restoreTodo } from '@/services/todoService';
 
 function Restore() {
     const [todosdelete, setTodoDelete] = useState<TodoItem[]>([]);
@@ -23,6 +23,15 @@ function Restore() {
             ...todoToRestore,
         }).catch((error) => console.log(error));
 
+        setTodoDelete((prev) =>
+            prev.filter((todo) => {
+                if (todo.id !== id) return todo;
+            }),
+        );
+    };
+
+    const handleHardDelete = async (id: number) => {
+        await deleteHardTodo(id).catch((error) => console.log(error));
         setTodoDelete((prev) =>
             prev.filter((todo) => {
                 if (todo.id !== id) return todo;
@@ -54,13 +63,22 @@ function Restore() {
                                     {todo.deadline ? formatDate(todo.deadline) : 'No DeadLine'}
                                 </Label>
                             </div>
-                            <Button
-                                variant="outline"
-                                className="mr-3 cursor-pointer"
-                                onClick={() => handleRestore(todo.id)}
-                            >
-                                Restore
-                            </Button>
+                            <div>
+                                <Button
+                                    variant="outline"
+                                    className="mr-3 cursor-pointer"
+                                    onClick={() => handleRestore(todo.id)}
+                                >
+                                    Restore
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    className="mr-3 cursor-pointer"
+                                    onClick={() => handleHardDelete(todo.id)}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 ))}

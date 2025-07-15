@@ -1,9 +1,24 @@
-import { Button } from '../components/ui/button';
+import { useEffect } from 'react';
 import { Label } from '../components/ui/label';
 import { Separator } from '../components/ui/separator';
-import { Outlet, Link, useOutlet } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 function Root() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/auth');
+        }
+    }, [navigate]);
+
+    const signOut = () => {
+        localStorage.removeItem('token');
+        navigate('/auth');
+    };
+
     return (
         <div className="flex">
             <div className="flex h-lvh w-[300px] flex-col bg-gray-300 p-3">
@@ -37,15 +52,8 @@ function Root() {
                             Restore
                         </Label>
                     </Link>
-                    {/* <Separator />
-                    <Link
-                        to={`/test`}
-                        className="flex h-[50px] cursor-pointer items-center rounded-2xl hover:bg-gray-200"
-                    >
-                        <Label htmlFor="test" className="ml-3 cursor-pointer text-[20px]">
-                            TestData
-                        </Label>
-                    </Link> */}
+                    <Separator />
+                    <Button onClick={signOut}>Sign Out</Button>
                 </div>
             </div>
             <div id="detail" className="flex-1">

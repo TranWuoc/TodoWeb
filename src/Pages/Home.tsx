@@ -3,7 +3,7 @@ import '../App.css';
 import searchIcon from '../assets/search.svg';
 import CardInfo from '../components/cardInfo/cardInfo.index';
 import Popup from '../components/popup/popop.index';
-import type { TodoItem } from '../todo.type';
+import type { TodoItem } from '../types/todo.type';
 import { Button } from '../components/ui/button';
 import { deleteTodo, getTodos, updateTodo } from '@/services/todoService';
 import { Input } from '@/components/ui/input';

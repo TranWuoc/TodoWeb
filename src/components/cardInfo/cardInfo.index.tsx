@@ -1,4 +1,4 @@
-import type { TodoItem } from '../../todo.type';
+import type { TodoItem } from '../../types/todo.type';
 import { Button } from '../ui/button';
 import formatDate from '../../utils/formatdate';
 import { Input } from '../ui/input';

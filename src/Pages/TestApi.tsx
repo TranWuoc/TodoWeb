@@ -1,4 +1,4 @@
-import type { TodoItem } from '@/todo.type';
+import type { TodoItem } from '@/types/todo.type';
 import { useEffect, useState } from 'react';
 import { Label } from '../components/ui/label';
 import formatDate from '@/utils/formatdate';

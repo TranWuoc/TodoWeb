@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Label } from '../components/ui/label';
-import type { TodoItem } from '../todo.type';
+import type { TodoItem } from '../types/todo.type';
 import { Separator } from '../components/ui/separator';
 import formatDate from '../utils/formatdate';
 import { getTodos } from '@/services/todoService';
