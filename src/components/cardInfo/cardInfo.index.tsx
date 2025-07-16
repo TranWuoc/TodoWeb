@@ -31,7 +31,7 @@ function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
                 <div className="flex gap-3 p-3">
                     <span className="text-white">
                         At: <br />
-                        {formatDate(todo.createAt)}
+                        {formatDate(todo.createdAt)}
                     </span>
                     <span className="w-[160px] text-red-400">
                         DeadLine:

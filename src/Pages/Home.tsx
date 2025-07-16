@@ -32,7 +32,6 @@ function Home() {
     useEffect(() => {
         getTodos()
             .then((todos) => {
-                // console.log('todos:', todos);
                 setTodos(todos);
                 checkOverDue(todos);
             })

@@ -35,7 +35,7 @@ function Popup({ onClose, onAdd }: PopupProps) {
     const onSubmit = async (data: FormData) => {
         const newTodo = {
             title: data.title,
-            createAt: new Date(),
+            createdAt: new Date(),
             deadline: data.deadline ? new Date(data.deadline) : null,
             isCompleted: false,
             dueDate: false,
