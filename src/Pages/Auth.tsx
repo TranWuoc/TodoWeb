@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { userSignIn, userSignUp } from '@/services/auth';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const signInSchema = yup.object({
     identifier: yup.string().required(),
@@ -41,6 +42,8 @@ type SignUpFormData = yup.InferType<typeof signUpSchema>;
 
 function Auth() {
     const navigate = useNavigate();
+    const [signUpError, setSignUpError] = useState('');
+    const [signInError, setSignInError] = useState('');
 
     const signInForm = useForm<SignInFormData>({
         resolver: yupResolver(signInSchema as yup.ObjectSchema<SignInFormData>),
@@ -58,9 +61,11 @@ function Auth() {
         };
         try {
             const res = await userSignIn(user);
+            setSignInError('');
             navigate('/');
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            const apiError = error?.response?.data?.error?.message;
+            setSignInError(apiError || 'SignIn Fail!');
         }
     };
     const handleSignUp = async (data: SignUpFormData) => {
@@ -71,9 +76,11 @@ function Auth() {
         };
         try {
             const res = await userSignUp(newUser);
+            setSignUpError('');
             navigate('/');
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            const apiError = error?.response?.data?.error?.message;
+            setSignUpError(apiError || 'SignUp Fail!');
         }
     };
 
@@ -106,6 +113,7 @@ function Auth() {
                                     <Label htmlFor="password">Password</Label>
                                     <InputField name="password" type="password" />
                                 </div>
+                                {signInError && <Label className="text-red-500">{signInError}</Label>}
                                 <Button className="cursor-pointer" type="submit">
                                     Sign In
                                 </Button>
@@ -120,7 +128,7 @@ function Auth() {
                             Sign Up
                         </Label>
                         <FormProvider {...signUpForm}>
-                            <form onSubmit={signUpForm.handleSubmit(handleSignUp)}>
+                            <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="mt-6 flex flex-col gap-3">
                                 <div className="flex w-[400px] flex-col gap-2">
                                     <Label htmlFor="username">Username</Label>
                                     <InputField name="username" />
@@ -133,6 +141,7 @@ function Auth() {
                                     <Label htmlFor="password">Password</Label>
                                     <InputField name="password" type="password" />
                                 </div>
+                                {signUpError && <Label className="text-red-500">{signUpError}</Label>}
                                 <Button className="cursor-pointer" type="submit">
                                     Sign Up
                                 </Button>

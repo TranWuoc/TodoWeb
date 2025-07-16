@@ -16,7 +16,8 @@ function Root() {
 
     const signOut = () => {
         localStorage.removeItem('token');
-        navigate('/auth');
+        localStorage.removeItem('userId');
+        window.location.href = 'auth';
     };
 
     return (
