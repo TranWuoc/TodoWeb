@@ -1,20 +1,8 @@
 import type { TodoItem } from '@/types/todo.type';
-import axios from 'axios';
-
-const URL = 'http://localhost:1337/api/todo-webs';
-
-function getAuthHeaders() {
-    const token = localStorage.getItem('token');
-    return {
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-    };
-}
+import axiosClient from '../utils/axiosClient';
 
 export async function getTodos(): Promise<TodoItem[]> {
-    const response = await axios.get(URL, getAuthHeaders());
+    const response = await axiosClient.get('/todo-webs');
     const res = response.data;
     const userId = Number(localStorage.getItem('userId'));
     return (res.data || [])
@@ -31,34 +19,33 @@ export async function getTodos(): Promise<TodoItem[]> {
 }
 
 export async function getTodosDeleted(): Promise<TodoItem[]> {
-    const response = await axios.get(URL + '/deleted', getAuthHeaders());
+    const response = await axiosClient.get('/todo-webs/deleted');
     const res = response.data;
     return res.data;
 }
 
 export async function createTodo(todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axios.post(URL, { data: todo }, getAuthHeaders());
-    console.log(response);
+    const response = await axiosClient.post('/todo-webs', { data: todo });
     const res = await response.data;
     return res.data;
 }
 
 export async function restoreTodo(id: number, todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axios.post(URL + '/' + id + '/restore', { data: todo }, getAuthHeaders());
+    const response = await axiosClient.post(`todo-webs/${id}/restore`, { data: todo });
     const res = await response.data;
     return res.data;
 }
 
 export async function updateTodo(id: number, todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axios.put(URL + '/' + id, { data: todo }, getAuthHeaders());
+    const response = await axiosClient.put(`/todo-webs/${id}`, { data: todo });
     const res = await response.data;
     return res.data;
 }
 
 export async function deleteTodo(id: number): Promise<void> {
-    await axios.delete(URL + '/' + id, getAuthHeaders());
+    await axiosClient.delete(`todo-webs/${id}`);
 }
 
 export async function deleteHardTodo(id: number) {
-    await axios.delete(URL + '/' + id + '/hard-delete', getAuthHeaders());
+    await axiosClient.delete(`todo-wes/${id}/hard-delete`);
 }

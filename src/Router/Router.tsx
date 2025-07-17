@@ -1,17 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Home from './Pages/Home.tsx';
-import Statistic from './Pages/Statistic.tsx';
+import Home from '../Pages/Home.tsx';
+import Statistic from '../Pages/Statistic.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Root from './Pages/Root.tsx';
-import Restore from './Pages/Restore.tsx';
-import TestApi from './Pages/TestApi.tsx';
-import Auth from './Pages/Auth.tsx';
+import Root from '../Pages/Root.tsx';
+import Restore from '../Pages/Restore.tsx';
+import TestApi from '../Pages/TestApi.tsx';
+import Auth from '../Pages/Auth.tsx';
+import { ProtectRouter } from './ProtectRouter.tsx';
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <Root />,
+        element: (
+            <ProtectRouter>
+                <Root />
+            </ProtectRouter>
+        ),
         children: [
             {
                 index: true,

@@ -1,25 +1,14 @@
-import { useEffect } from 'react';
 import { Label } from '../components/ui/label';
 import { Separator } from '../components/ui/separator';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 function Root() {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/auth');
-        }
-    }, [navigate]);
-
     const signOut = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         window.location.href = 'auth';
     };
-
     return (
         <div className="flex">
             <div className="flex h-lvh w-[300px] flex-col bg-gray-300 p-3">
