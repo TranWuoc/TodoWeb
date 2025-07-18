@@ -6,10 +6,13 @@ import { Calendar24 } from '@/components/ui/Calender24';
 import { Label } from '@radix-ui/react-label';
 import InputField from '../input/InputField';
 import { Button } from '../ui/button';
-import { createTodo } from '@/services/todoService';
+import { createTodo, getTodo } from '@/services/todoService';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 type PopupProps = {
     onClose: () => void;
-    onAdd: (newTodo: TodoItem) => void;
+    onAdd: (newTodo: Omit<TodoItem, 'id'>) => void;
+    onEdit?: TodoItem | null;
 };
 
 const schema = yup.object({
@@ -27,10 +30,28 @@ const schema = yup.object({
 
 type FormData = yup.InferType<typeof schema>;
 
-function Popup({ onClose, onAdd }: PopupProps) {
+function Popup({ onClose, onAdd, onEdit }: PopupProps) {
     const methods = useForm<FormData>({
         resolver: yupResolver(schema as yup.ObjectSchema<FormData>),
     });
+
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['todo', onEdit?.id],
+        queryFn: () => getTodo(onEdit!.id),
+        enabled: Boolean(onEdit?.id),
+        select: (res) => res.data,
+    });
+
+    console.log(data?.title);
+
+    useEffect(() => {
+        if (data) {
+            methods.reset({
+                title: data.title,
+                deadline: data.deadline ? new Date(data.deadline) : null,
+            });
+        }
+    }, [data, methods]);
 
     const onSubmit = async (data: FormData) => {
         const newTodo = {
@@ -40,8 +61,8 @@ function Popup({ onClose, onAdd }: PopupProps) {
             isCompleted: false,
             dueDate: false,
         };
-        const created = await createTodo(newTodo);
-        onAdd(created);
+        onAdd(newTodo);
+        onClose();
     };
 
     return (
@@ -56,6 +77,8 @@ function Popup({ onClose, onAdd }: PopupProps) {
                 <span className="float-right cursor-pointer text-[28px] font-bold" onClick={onClose}>
                     &times;
                 </span>
+
+                <Label className="text-2xl text-blue-500">{onEdit ? 'Edit Todo' : 'Add Todo'}</Label>
                 <FormProvider {...methods}>
                     <form onSubmit={methods.handleSubmit(onSubmit)}>
                         <Label htmlFor="title">Title</Label>
@@ -67,7 +90,7 @@ function Popup({ onClose, onAdd }: PopupProps) {
                         </div>
 
                         <div className="absolute bottom-0 right-0 flex gap-2 p-2">
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">{onEdit ? 'Update' : 'Add Todo'}</Button>
                         </div>
                     </form>
                 </FormProvider>

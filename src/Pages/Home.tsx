@@ -5,38 +5,72 @@ import CardInfo from '../components/cardInfo/cardInfo.index';
 import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../types/todo.type';
 import { Button } from '../components/ui/button';
-import { deleteTodo, getTodos, updateTodo } from '@/services/todoService';
+import { createTodo, deleteTodo, getTodo, getTodos, updateTodo } from '@/services/todoService';
 import { Input } from '@/components/ui/input';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 function Home() {
+    const queryClient = useQueryClient();
     const [showPopup, setShowPopup] = useState(false);
-    const [todos, setTodos] = useState<TodoItem[]>([]);
     const [search, setSearch] = useState('');
+    const [editTodo, setEditTodo] = useState<TodoItem | null>(null);
 
-    const checkOverDue = async (todos: TodoItem[]) => {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['todos'],
+        queryFn: getTodos,
+        select: (res) => res.data,
+    });
+
+    const checkOverDue = async (data: TodoItem[]) => {
         const now = new Date().getTime();
-        const todosUpdate = todos.filter((todo) => todo.deadline && todo.deadline.getTime() <= now && !todo.dueDate);
 
-        Promise.all(todosUpdate.map((todo) => updateTodo(todo.id, { dueDate: true }))).then(() =>
-            setTodos((prev) =>
-                prev.map((todo) => {
-                    if (todo.deadline && todo.deadline.getTime() <= now) {
-                        return { ...todo, dueDate: true };
-                    }
-                    return todo;
+        const todosUpdate = data.filter((todo) => {
+            const deadlineDate = new Date(todo.deadline || '');
+            return deadlineDate.getTime() <= now;
+        });
+        Promise.all(
+            todosUpdate.map((todo) =>
+                updateTodoMutation.mutate({
+                    id: todo.id,
+                    todo: { ...todo, dueDate: true },
                 }),
             ),
         );
     };
 
     useEffect(() => {
-        getTodos()
-            .then((todos) => {
-                setTodos(todos);
-                checkOverDue(todos);
-            })
-            .catch((error) => console.log(error));
-    }, []);
+        if (data && !isLoading) {
+            checkOverDue(data);
+        }
+    }, [isLoading]);
+
+    useEffect(() => {}, []);
+
+    const addTodoMutation = useMutation({
+        mutationFn: createTodo,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['todos'] });
+        },
+        onError: (error) => {
+            console.error('Create todo failed:', error);
+        },
+    });
+
+    const deleteTodoMutation = useMutation({
+        mutationFn: deleteTodo,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['todos'] });
+        },
+        onError: (error) => console.log('Delete todo failed:', error),
+    });
+
+    const updateTodoMutation = useMutation({
+        mutationFn: ({ id, todo }: { id: number; todo: TodoItem }) => {
+            return updateTodo(id, todo);
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
+        onError: (error) => console.log(error),
+    });
 
     const handleOpenAddTodo = () => {
         setShowPopup(true);
@@ -44,31 +78,40 @@ function Home() {
 
     const handleCloseAddTodo = () => {
         setShowPopup(false);
+        setEditTodo(null);
     };
 
-    const handleAddTodo = async () => {
-        const todosData = await getTodos();
-        setTodos(todosData);
+    const handleAddTodo = async (newTodo: Omit<TodoItem, 'id'>) => {
+        addTodoMutation.mutate(newTodo);
         setShowPopup(false);
     };
 
     const toggleTodoState = async (id: number) => {
-        const todo = todos.find((t) => t.id === id);
+        const todo = data?.find((t) => t.id === id);
         if (!todo) return;
-
-        await updateTodo(id, {
-            isCompleted: !todo.isCompleted,
+        updateTodoMutation.mutate({
+            id,
+            todo: { ...todo, isCompleted: !todo.isCompleted },
         });
-
-        setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, isCompleted: !t.isCompleted } : t)));
     };
 
     const handleDeleteTodo = async (id: number) => {
-        await deleteTodo(id).catch((error) => console.log(error));
-        setTodos((prev) => prev.filter((todo) => todo.id !== id));
+        deleteTodoMutation.mutate(id);
     };
 
-    const filteredTodos = todos.filter((todo) => todo.title.toLowerCase().includes(search.toLowerCase()));
+    const handleUpdateTodo = (id: number, newTodo: Omit<TodoItem, 'id'>) => {
+        const selectedTodo = data?.find((todo) => (todo.id = id));
+        if (selectedTodo) {
+            setEditTodo(selectedTodo);
+            setShowPopup(true);
+            updateTodoMutation.mutate({
+                id,
+                todo: { ...selectedTodo, ...newTodo },
+            });
+        }
+    };
+
+    const filteredTodos = data?.filter((todo) => todo.title.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div className="flex flex-row justify-center p-[20px]">
@@ -86,12 +129,13 @@ function Home() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
-                        {(search.trim() ? filteredTodos : todos).map((todo) => (
+                        {(search.trim() ? (filteredTodos ?? []) : (data ?? [])).map((todo: TodoItem) => (
                             <CardInfo
                                 key={todo.id}
                                 todo={todo}
                                 onToggle={toggleTodoState}
                                 onDelete={() => handleDeleteTodo(todo.id)}
+                                onUpdate={() => handleUpdateTodo(todo.id, todo)}
                             />
                         ))}
                     </div>
@@ -102,7 +146,19 @@ function Home() {
                 >
                     +
                 </Button>
-                {showPopup && <Popup onClose={handleCloseAddTodo} onAdd={handleAddTodo} />}
+                {showPopup && (
+                    <Popup
+                        onClose={handleCloseAddTodo}
+                        onEdit={editTodo}
+                        onAdd={(newTodo) => {
+                            if (editTodo) {
+                                handleUpdateTodo(editTodo.id, newTodo);
+                            } else {
+                                handleAddTodo(newTodo);
+                            }
+                        }}
+                    />
+                )}
                 <div
                     className="flex h-[80px] w-full flex-row rounded-b-2xl"
                     style={{ backgroundColor: '#343148' }}

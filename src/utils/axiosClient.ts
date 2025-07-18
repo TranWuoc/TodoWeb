@@ -1,13 +1,21 @@
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 
-const axiosClient = axios.create({
-    baseURL: 'http://localhost:1337/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+class Http {
+    instance: AxiosInstance;
+    constructor() {
+        this.instance = axios.create({
+            baseURL: 'http://localhost:1337/api',
+            timeout: 10000,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    }
+}
 
-axiosClient.interceptors.request.use(
+const http = new Http().instance;
+
+http.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -20,8 +28,7 @@ axiosClient.interceptors.request.use(
         return Promise.reject(error);
     },
 );
-
-axios.interceptors.response.use(
+http.interceptors.response.use(
     (response) => {
         return response;
     },
@@ -56,4 +63,4 @@ axios.interceptors.response.use(
     },
 );
 
-export default axiosClient;
+export default http;

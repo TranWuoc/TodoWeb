@@ -1,51 +1,19 @@
 import type { TodoItem } from '@/types/todo.type';
-import axiosClient from '../utils/axiosClient';
+import http from '../utils/axiosClient';
 
-export async function getTodos(): Promise<TodoItem[]> {
-    const response = await axiosClient.get('/todo-webs');
-    const res = response.data;
-    const userId = Number(localStorage.getItem('userId'));
-    return (res.data || [])
-        .filter((item: any) => item && item.users_permissions_user && item.users_permissions_user.id === userId)
-        .map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            deadline: item.deadline ? new Date(item.deadline) : null,
-            isCompleted: item.isCompleted,
-            dueDate: item.dueDate,
-            createdAt: item.createdAt ? new Date(item.createdAt) : null,
-        }))
-        .sort((a: any, b: any) => b.id - a.id);
-}
+export const getTodos = () => http.get<TodoItem[]>('todo-webs');
 
-export async function getTodosDeleted(): Promise<TodoItem[]> {
-    const response = await axiosClient.get('/todo-webs/deleted');
-    const res = response.data;
-    return res.data;
-}
+export const getTodo = (id: number) => http.get<TodoItem>(`todo-webs/${id}`);
 
-export async function createTodo(todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axiosClient.post('/todo-webs', { data: todo });
-    const res = await response.data;
-    return res.data;
-}
+export const getTodosDeleted = () => http.get<TodoItem[]>('todo-webs/deleted');
 
-export async function restoreTodo(id: number, todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axiosClient.post(`todo-webs/${id}/restore`, { data: todo });
-    const res = await response.data;
-    return res.data;
-}
+export const createTodo = (todo: Omit<TodoItem, 'id'>) => http.post<TodoItem>('todo-webs', { data: todo });
 
-export async function updateTodo(id: number, todo: Partial<TodoItem>): Promise<TodoItem> {
-    const response = await axiosClient.put(`/todo-webs/${id}`, { data: todo });
-    const res = await response.data;
-    return res.data;
-}
+export const restoreTodo = (id: number, todo: TodoItem) =>
+    http.post<TodoItem>(`todo-webs/${id}/restore`, { data: todo });
 
-export async function deleteTodo(id: number): Promise<void> {
-    await axiosClient.delete(`todo-webs/${id}`);
-}
+export const updateTodo = (id: number, todo: TodoItem) => http.put<TodoItem>(`todo-webs/${id}`, { data: todo });
 
-export async function deleteHardTodo(id: number) {
-    await axiosClient.delete(`todo-wes/${id}/hard-delete`);
-}
+export const deleteTodo = (id: number) => http.delete(`todo-webs/${id}`);
+
+export const deleteHardTodo = (id: number) => http.delete(`todo-webs/${id}/hard-delete`);

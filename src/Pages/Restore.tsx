@@ -4,39 +4,38 @@ import type { TodoItem } from '../types/todo.type';
 import formatDate from '../utils/formatdate';
 import { Button } from '../components/ui/button';
 import { deleteHardTodo, getTodosDeleted, restoreTodo } from '@/services/todoService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 function Restore() {
-    const [todosdelete, setTodoDelete] = useState<TodoItem[]>([]);
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        getTodosDeleted()
-            .then((data) => {
-                setTodoDelete(Array.isArray(data) ? data : []);
-            })
-            .catch((error) => console.log(error));
-    }, []);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['todosdeleted'],
+        queryFn: getTodosDeleted,
+        select: (res) => res.data,
+    });
 
-    const handleRestore = async (id: number) => {
-        const todoToRestore = todosdelete.find((todo) => todo.id == id);
+    const handleRestoreMutation = useMutation({
+        mutationFn: ({ id, todo }: { id: number; todo: TodoItem }) => restoreTodo(id, todo),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todosdeleted'] }),
+        onError: (error) => console.log(error),
+    });
 
-        await restoreTodo(id, {
-            ...todoToRestore,
-        }).catch((error) => console.log(error));
+    const handleHardDeletemutation = useMutation({
+        mutationFn: (id: number) => deleteHardTodo(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todosdeleted'] }),
+        onError: (error) => console.log(error),
+    });
 
-        setTodoDelete((prev) =>
-            prev.filter((todo) => {
-                if (todo.id !== id) return todo;
-            }),
-        );
+    const handleRestore = async (id: number, todo: TodoItem) => {
+        handleRestoreMutation.mutate({
+            id,
+            todo,
+        });
     };
 
     const handleHardDelete = async (id: number) => {
-        await deleteHardTodo(id).catch((error) => console.log(error));
-        setTodoDelete((prev) =>
-            prev.filter((todo) => {
-                if (todo.id !== id) return todo;
-            }),
-        );
+        handleHardDeletemutation.mutate(id);
     };
 
     return (
@@ -45,7 +44,7 @@ function Restore() {
                 Restore
             </Label>
             <div className="mt-14 flex h-[500px] w-[700px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-gray-100 p-2">
-                {todosdelete.map((todo) => (
+                {data?.map((todo: TodoItem) => (
                     <div
                         key={todo.id}
                         className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 border-red-600 bg-zinc-300"
@@ -67,7 +66,7 @@ function Restore() {
                                 <Button
                                     variant="outline"
                                     className="mr-3 cursor-pointer"
-                                    onClick={() => handleRestore(todo.id)}
+                                    onClick={() => handleRestore(todo.id, todo)}
                                 >
                                     Restore
                                 </Button>

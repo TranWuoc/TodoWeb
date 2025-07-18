@@ -6,9 +6,10 @@ type CardInfoProps = {
     todo: TodoItem;
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
+    onUpdate: (id: number) => void;
 };
 
-function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
+function CardInfo({ todo, onToggle, onDelete, onUpdate }: CardInfoProps) {
     return (
         <div
             className="bg-gra relative flex h-[120px] w-full flex-row rounded-3xl"
@@ -40,13 +41,14 @@ function CardInfo({ todo, onToggle, onDelete }: CardInfoProps) {
                     </span>
                 </div>
             </div>
-            <Button
-                className="m-[10px] mt-[50px] cursor-pointer"
-                variant="destructive"
-                onClick={() => onDelete(todo.id)}
-            >
-                Delete
-            </Button>
+            <div className="flex flex-col justify-center gap-3">
+                <Button className="cursor-pointer" variant="destructive" onClick={() => onDelete(todo.id)}>
+                    Delete
+                </Button>
+                <Button className="cursor-pointer" variant="update" onClick={() => onUpdate(todo.id)}>
+                    Update
+                </Button>
+            </div>
         </div>
     );
 }
