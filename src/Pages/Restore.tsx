@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Label } from '../components/ui/label';
-import type { TodoItem } from '../types/todo.type';
-import formatDate from '../utils/formatdate';
-import { Button } from '../components/ui/button';
 import { deleteHardTodo, getTodosDeleted, restoreTodo } from '@/services/todoService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TodoItem } from '../types/todo.type';
+import formatDate from '../utils/formatdate';
+import { Label } from '../components/ui/label';
+import { Button } from '../components/ui/button';
 
 function Restore() {
     const queryClient = useQueryClient();
 
-    const { data, isLoading, error } = useQuery({
+    const { data } = useQuery({
         queryKey: ['todosdeleted'],
         queryFn: getTodosDeleted,
         select: (res) => res.data,

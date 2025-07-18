@@ -5,7 +5,7 @@ import CardInfo from '../components/cardInfo/cardInfo.index';
 import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../types/todo.type';
 import { Button } from '../components/ui/button';
-import { createTodo, deleteTodo, getTodo, getTodos, updateTodo } from '@/services/todoService';
+import { createTodo, deleteTodo, getTodos, updateTodo } from '@/services/todoService';
 import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -15,7 +15,7 @@ function Home() {
     const [search, setSearch] = useState('');
     const [editTodo, setEditTodo] = useState<TodoItem | null>(null);
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ['todos'],
         queryFn: getTodos,
         select: (res) => res.data,

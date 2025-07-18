@@ -6,7 +6,7 @@ import { Calendar24 } from '@/components/ui/Calender24';
 import { Label } from '@radix-ui/react-label';
 import InputField from '../input/InputField';
 import { Button } from '../ui/button';
-import { createTodo, getTodo } from '@/services/todoService';
+import { getTodo } from '@/services/todoService';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 type PopupProps = {
@@ -35,7 +35,7 @@ function Popup({ onClose, onAdd, onEdit }: PopupProps) {
         resolver: yupResolver(schema as yup.ObjectSchema<FormData>),
     });
 
-    const { data, isLoading, error } = useQuery({
+    const { data } = useQuery({
         queryKey: ['todo', onEdit?.id],
         queryFn: () => getTodo(onEdit!.id),
         enabled: Boolean(onEdit?.id),
