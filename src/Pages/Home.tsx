@@ -5,21 +5,18 @@ import CardInfo from '../components/cardInfo/cardInfo.index';
 import Popup from '../components/popup/popop.index';
 import type { TodoItem } from '../types/todo.type';
 import { Button } from '../components/ui/button';
-import { createTodo, deleteTodo, getTodos, updateTodo } from '@/services/todoService';
 import { Input } from '@/components/ui/input';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCreateTodo, useDeleteTodo, useGetTodoList, useUpdateTodo } from '@/hooks/getTodoList';
 
 function Home() {
-    const queryClient = useQueryClient();
     const [showPopup, setShowPopup] = useState(false);
     const [search, setSearch] = useState('');
     const [editTodo, setEditTodo] = useState<TodoItem | null>(null);
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['todos'],
-        queryFn: getTodos,
-        select: (res) => res.data,
-    });
+    const { data: todoList, isLoading } = useGetTodoList();
+    const { mutate: createTodo } = useCreateTodo();
+    const { mutate: updateTodo } = useUpdateTodo();
+    const { mutate: deleteTodo } = useDeleteTodo();
 
     const checkOverDue = async (data: TodoItem[]) => {
         const now = new Date().getTime();
@@ -30,7 +27,7 @@ function Home() {
         });
         Promise.all(
             todosUpdate.map((todo) =>
-                updateTodoMutation.mutate({
+                updateTodo({
                     id: todo.id,
                     todo: { ...todo, dueDate: true },
                 }),
@@ -39,38 +36,10 @@ function Home() {
     };
 
     useEffect(() => {
-        if (data && !isLoading) {
-            checkOverDue(data);
+        if (todoList && !isLoading) {
+            checkOverDue(todoList);
         }
     }, [isLoading]);
-
-    useEffect(() => {}, []);
-
-    const addTodoMutation = useMutation({
-        mutationFn: createTodo,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['todos'] });
-        },
-        onError: (error) => {
-            console.error('Create todo failed:', error);
-        },
-    });
-
-    const deleteTodoMutation = useMutation({
-        mutationFn: deleteTodo,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['todos'] });
-        },
-        onError: (error) => console.log('Delete todo failed:', error),
-    });
-
-    const updateTodoMutation = useMutation({
-        mutationFn: ({ id, todo }: { id: number; todo: TodoItem }) => {
-            return updateTodo(id, todo);
-        },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
-        onError: (error) => console.log(error),
-    });
 
     const handleOpenAddTodo = () => {
         setShowPopup(true);
@@ -82,36 +51,36 @@ function Home() {
     };
 
     const handleAddTodo = async (newTodo: Omit<TodoItem, 'id'>) => {
-        addTodoMutation.mutate(newTodo);
+        createTodo(newTodo);
         setShowPopup(false);
     };
 
     const toggleTodoState = async (id: number) => {
-        const todo = data?.find((t) => t.id === id);
+        const todo = todoList?.find((t) => t.id === id);
         if (!todo) return;
-        updateTodoMutation.mutate({
+        updateTodo({
             id,
             todo: { ...todo, isCompleted: !todo.isCompleted },
         });
     };
 
     const handleDeleteTodo = async (id: number) => {
-        deleteTodoMutation.mutate(id);
+        deleteTodo(id);
     };
 
     const handleUpdateTodo = (id: number, newTodo: Omit<TodoItem, 'id'>) => {
-        const selectedTodo = data?.find((todo) => (todo.id = id));
+        const selectedTodo = todoList?.find((todo) => (todo.id = id));
         if (selectedTodo) {
             setEditTodo(selectedTodo);
             setShowPopup(true);
-            updateTodoMutation.mutate({
+            updateTodo({
                 id,
                 todo: { ...selectedTodo, ...newTodo },
             });
         }
     };
 
-    const filteredTodos = data?.filter((todo) => todo.title.toLowerCase().includes(search.toLowerCase()));
+    const filteredTodos = todoList?.filter((todo) => todo.title.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div className="flex flex-row justify-center p-[20px]">
@@ -129,7 +98,7 @@ function Home() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                     <div className="flex h-[512px] flex-col gap-2 overflow-y-auto">
-                        {(search.trim() ? (filteredTodos ?? []) : (data ?? [])).map((todo: TodoItem) => (
+                        {(search.trim() ? (filteredTodos ?? []) : (todoList ?? [])).map((todo: TodoItem) => (
                             <CardInfo
                                 key={todo.id}
                                 todo={todo}

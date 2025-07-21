@@ -1,17 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useGetTodoList } from '@/hooks/getTodoList';
 import { Label } from '../components/ui/label';
-import type { TodoItem } from '../types/todo.type';
 import { Separator } from '../components/ui/separator';
 import formatDate from '../utils/formatdate';
-import { getTodos } from '@/services/todoService';
-import { useQuery } from '@tanstack/react-query';
-function Statistic() {
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['todos'],
-        queryFn: getTodos,
-        select: (res) => res.data,
-    });
 
+function Statistic() {
+    const { data: todoList } = useGetTodoList();
     return (
         <div className="mt-[50px] flex items-center justify-center p-[20px]">
             <div className="bg-accent flex h-[700px] w-[900px] items-center justify-center rounded-3xl border-2 p-3">
@@ -23,10 +16,10 @@ function Statistic() {
                     <div className="flex flex-row gap-5">
                         <div className="flex h-[300px] w-[420px] flex-col gap-5 overflow-y-auto">
                             <Label className="text-green-500"> Todo is completed </Label>
-                            {data?.filter((todo) => todo.isCompleted).length === 0 ? (
+                            {todoList?.filter((todo) => todo.isCompleted).length === 0 ? (
                                 <Label>No todo</Label>
                             ) : (
-                                data
+                                todoList
                                     ?.filter((todo) => todo.isCompleted)
                                     .map((todo) => (
                                         <div
@@ -46,10 +39,10 @@ function Statistic() {
                         </div>
                         <div className="flex h-[300px] w-[420px] flex-col gap-5 overflow-y-auto">
                             <Label className="text-red-600"> Todos were out of date </Label>
-                            {data?.filter((todo) => todo.dueDate == true).length === 0 ? (
+                            {todoList?.filter((todo) => todo.dueDate == true).length === 0 ? (
                                 <Label>No todo</Label>
                             ) : (
-                                data
+                                todoList
                                     ?.filter((todo) => todo.dueDate == true)
                                     .map((todo) => (
                                         <div

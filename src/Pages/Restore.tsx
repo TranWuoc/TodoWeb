@@ -1,40 +1,20 @@
-import { deleteHardTodo, getTodosDeleted, restoreTodo } from '@/services/todoService';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useGetTodoDeletedList, useHardDeleteTodo, useRestoreTodo } from '@/hooks/getTodoList';
 import type { TodoItem } from '../types/todo.type';
 import formatDate from '../utils/formatdate';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
 
 function Restore() {
-    const queryClient = useQueryClient();
-
-    const { data } = useQuery({
-        queryKey: ['todosdeleted'],
-        queryFn: getTodosDeleted,
-        select: (res) => res.data,
-    });
-
-    const handleRestoreMutation = useMutation({
-        mutationFn: ({ id, todo }: { id: number; todo: TodoItem }) => restoreTodo(id, todo),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todosdeleted'] }),
-        onError: (error) => console.log(error),
-    });
-
-    const handleHardDeletemutation = useMutation({
-        mutationFn: (id: number) => deleteHardTodo(id),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todosdeleted'] }),
-        onError: (error) => console.log(error),
-    });
+    const { data: todoDeletedList } = useGetTodoDeletedList();
+    const { mutate: hardDeleteTodo } = useHardDeleteTodo();
+    const { mutate: restoreTodo } = useRestoreTodo();
 
     const handleRestore = async (id: number, todo: TodoItem) => {
-        handleRestoreMutation.mutate({
-            id,
-            todo,
-        });
+        restoreTodo({ id, todo });
     };
 
     const handleHardDelete = async (id: number) => {
-        handleHardDeletemutation.mutate(id);
+        hardDeleteTodo(id);
     };
 
     return (
@@ -43,7 +23,7 @@ function Restore() {
                 Restore
             </Label>
             <div className="mt-14 flex h-[500px] w-[700px] flex-col gap-3 overflow-y-auto rounded-2xl border-2 bg-gray-100 p-2">
-                {data?.map((todo: TodoItem) => (
+                {todoDeletedList?.map((todo: TodoItem) => (
                     <div
                         key={todo.id}
                         className="flex h-[70px] min-h-[70px] w-full flex-col justify-center rounded-2xl border-2 border-red-600 bg-zinc-300"

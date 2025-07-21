@@ -5,7 +5,6 @@ import Statistic from '../Pages/Statistic.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from '../Pages/Root.tsx';
 import Restore from '../Pages/Restore.tsx';
-import TestApi from '../Pages/TestApi.tsx';
 import Auth from '../Pages/Auth.tsx';
 import { ProtectRouter } from './ProtectRouter.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -33,10 +32,6 @@ const router = createBrowserRouter([
             {
                 path: '/restore',
                 element: <Restore />,
-            },
-            {
-                path: '/test',
-                element: <TestApi />,
             },
         ],
     },
