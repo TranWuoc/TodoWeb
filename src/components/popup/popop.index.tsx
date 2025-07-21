@@ -42,8 +42,6 @@ function Popup({ onClose, onAdd, onEdit }: PopupProps) {
         select: (res) => res.data,
     });
 
-    console.log(data?.title);
-
     useEffect(() => {
         if (data) {
             methods.reset({
@@ -71,7 +69,7 @@ function Popup({ onClose, onAdd, onEdit }: PopupProps) {
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
         >
             <div
-                className="relative m-auto h-[300px] w-[50%] rounded-2xl border-solid p-[20px]"
+                className="relative m-auto h-[300px] w-[30%] rounded-2xl border-solid p-[20px]"
                 style={{ backgroundColor: '#D7C49E' }}
             >
                 <span className="float-right cursor-pointer text-[28px] font-bold" onClick={onClose}>

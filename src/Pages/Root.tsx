@@ -46,7 +46,7 @@ function Root() {
                     <Button onClick={signOut}>Sign Out</Button>
                 </div>
             </div>
-            <div id="detail" className="flex-1">
+            <div id="detail" className="flex flex-1 items-center justify-center">
                 <Outlet />
             </div>
         </div>

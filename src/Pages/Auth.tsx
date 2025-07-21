@@ -60,7 +60,7 @@ function Auth() {
             password: data.password,
         };
         try {
-            const res = await userSignIn(user);
+            await userSignIn(user);
             setSignInError('');
             navigate('/');
         } catch (error: any) {
@@ -75,7 +75,7 @@ function Auth() {
             password: data.password,
         };
         try {
-            const res = await userSignUp(newUser);
+            await userSignUp(newUser);
             setSignUpError('');
             navigate('/');
         } catch (error: any) {
